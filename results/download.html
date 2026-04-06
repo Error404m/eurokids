@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Result Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1a2e;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;padding:30px 20px 60px;}
+
+.toolbar{position:fixed;top:16px;right:16px;z-index:999;display:flex;gap:10px;}
+.btn{border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
+.btn-dl{background:linear-gradient(135deg,#c2185b,#880e4f);color:#fff;box-shadow:0 4px 20px rgba(194,24,91,.4);}
+.btn-dl:hover{transform:translateY(-1px);}
+.btn-back{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.btn-back:hover{background:rgba(255,255,255,.18);}
+
+.status-bar{position:fixed;top:16px;left:16px;z-index:999;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 16px;font-size:13px;color:#fff;}
+
+.pages-wrapper{display:flex;flex-direction:column;gap:24px;align-items:center;}
+
+/* A4 landscape 297x210mm at 96dpi ≈ 1122x794px */
+.card-page{width:1122px;height:794px;position:relative;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.5);border-radius:4px;}
+
+/* ═══ PAGE 1 ═══ */
+.p1-left{position:absolute;left:0;top:0;width:308px;height:100%;background:linear-gradient(170deg,#0d1b3e 0%,#1a2f5e 60%,#0d1b3e 100%);display:flex;flex-direction:column;padding:36px 28px 28px;}
+.school-logo-ring{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#c2185b,#e91e8c);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 0 0 5px rgba(194,24,91,.2),0 8px 24px rgba(0,0,0,.3);flex-shrink:0;}
+.school-logo-ring span{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:#fff;line-height:1;}
+.school-name-left{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff;line-height:1.15;}
+.school-branch-left{font-size:11px;font-weight:700;color:#e91e8c;letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.school-addr-left{font-size:10.5px;color:rgba(255,255,255,.45);line-height:1.6;margin-top:10px;}
+.divider-left{height:1px;background:rgba(255,255,255,.1);margin:22px 0;flex-shrink:0;}
+.sidebar-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px;}
+.sidebar-value{font-size:15px;font-weight:600;color:#fff;line-height:1.35;}
+.sidebar-row{margin-bottom:16px;}
+
+.perf-ring-wrap{margin-top:auto;padding:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;text-align:center;flex-shrink:0;}
+.perf-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.perf-ring svg{transform:rotate(-90deg);}
+.perf-ring .ring-text{position:absolute;text-align:center;}
+.ring-pct{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:#fff;line-height:1;display:block;}
+.ring-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;}
+.perf-meta{display:flex;gap:20px;justify-content:center;margin-top:6px;}
+.pm-item{text-align:center;}
+.pm-val{font-size:19px;font-weight:700;color:#fff;display:block;}
+.pm-key{font-size:9px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;}
+
+.p1-right{position:absolute;left:308px;top:0;right:0;height:100%;padding:30px 34px 22px;display:flex;flex-direction:column;}
+.accent-bar{position:absolute;top:0;left:308px;right:0;height:6px;background:linear-gradient(90deg,#c2185b,#e91e8c,#f06292);}
+
+.right-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-top:4px;}
+.report-tag{background:linear-gradient(135deg,#c2185b,#880e4f);color:#fff;border-radius:7px;padding:7px 18px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+
+.s-head{font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#c2185b;display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-shrink:0;}
+.s-head::after{content:"";flex:1;height:1px;background:#f0e0e8;}
+
+.marks-table{width:100%;border-collapse:collapse;font-size:12px;flex-shrink:0;}
+.marks-table thead tr{background:linear-gradient(90deg,#c2185b,#ad1457);}
+.marks-table thead th{color:#fff;padding:9px 10px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;border:none;}
+.marks-table thead th:not(:nth-child(2)){text-align:center;}
+.marks-table tbody td{padding:9px 10px;border-bottom:1px solid #f5eaf0;font-size:12px;text-align:center;color:#333;}
+.marks-table tbody td:nth-child(2){text-align:left;font-weight:600;color:#1a1a2e;}
+.marks-table tbody tr:nth-child(even) td{background:#fdf8fb;}
+.grade-pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:800;}
+.gpa{background:#e8f5e9;color:#2e7d32;}
+.gpb{background:#e3f2fd;color:#1565c0;}
+.gpc{background:#fff3e0;color:#e65100;}
+.gpd{background:#fce4ec;color:#880e4f;}
+.gpe{background:#fafafa;color:#aaa;}
+
+.tbar{display:flex;align-items:center;gap:6px;}
+.tbar-track{flex:1;height:6px;background:#f0dde8;border-radius:9px;overflow:hidden;}
+.tbar-fill{height:100%;border-radius:9px;background:linear-gradient(90deg,#e91e8c,#c2185b);}
+.tbar-pct{font-size:10px;font-weight:700;color:#c2185b;width:32px;text-align:right;}
+
+.cos-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0 14px;flex-shrink:0;}
+.cos-item{background:linear-gradient(160deg,#fce4ec,#f8bbd9);border:1px solid #f0c0d8;border-radius:10px;padding:10px 6px;text-align:center;}
+.cos-key{font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#880e4f;opacity:.75;}
+.cos-val{font-size:20px;font-weight:900;color:#c2185b;line-height:1.1;margin-top:3px;}
+
+/* Remarks on its own row */
+.remarks-block{background:linear-gradient(135deg,#fffde7,#fff8e1);border:1px solid #ffe082;border-radius:12px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;flex-shrink:0;margin-top:auto;}
+.rem-icon{font-size:18px;line-height:1.2;flex-shrink:0;}
+.rem-text{font-size:11.5px;line-height:1.65;color:#5d4037;font-style:italic;}
+.rem-author{font-size:10.5px;font-weight:800;color:#8d6e63;margin-top:4px;}
+
+/* Signatures on separate row below */
+.sig-strip{display:flex;gap:0;align-items:flex-end;flex-shrink:0;margin-top:16px;border-top:1px dashed #f0e0e8;padding-top:14px;}
+.sig-item{flex:1;text-align:center;}
+.sig-line{border-bottom:1.5px solid #c2185b;height:30px;position:relative;margin:0 16px;}
+.sig-script{position:absolute;left:50%;transform:translateX(-50%);top:4px;font-size:13px;color:#1a1a2e;white-space:nowrap;font-family:'Brush Script MT','Comic Sans MS',cursive;}
+.sig-label{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#aaa;margin-top:5px;}
+
+.page-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f0e0e8;padding-top:9px;margin-top:14px;font-size:9px;color:#bbb;flex-shrink:0;}
+.page-footer strong{color:#888;}
+
+/* ═══ PAGE 2 ═══ */
+.p2-bg{position:absolute;inset:0;background:linear-gradient(150deg,#fce4ec 0%,#fff 40%,#e8eaf6 100%);}
+.p2-content{position:absolute;inset:0;padding:40px 50px;display:flex;flex-direction:column;}
+.p2-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;}
+.p2-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:#0d1b3e;line-height:1;}
+.p2-title span{display:block;font-size:13px;font-weight:700;color:#c2185b;letter-spacing:2px;text-transform:uppercase;font-family:'DM Sans',sans-serif;margin-bottom:4px;}
+.p2-school-badge{background:linear-gradient(135deg,#0d1b3e,#1a2f5e);color:#fff;border-radius:10px;padding:10px 18px;text-align:right;}
+.p2-school-badge .bn{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;}
+.p2-school-badge .bs{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.6;margin-top:2px;}
+.p2-tables{display:grid;grid-template-columns:1fr 1fr;gap:30px;flex:1;}
+.grade-card{background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,.06);overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.07);}
+.grade-card-head{padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.grade-card-head.formative{background:linear-gradient(135deg,#0d1b3e,#1a2f5e);}
+.grade-card-head.summative{background:linear-gradient(135deg,#880e4f,#c2185b);}
+.gh-icon{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.gh-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:#fff;}
+.gh-sub{font-size:9px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.grade-tbl{width:100%;border-collapse:collapse;}
+.grade-tbl thead th{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#999;padding:10px 16px 8px;text-align:center;border-bottom:1px solid #f0f0f0;}
+.grade-tbl thead th:first-child{text-align:left;}
+.grade-tbl tbody td{padding:9px 16px;text-align:center;font-size:11.5px;color:#333;border-bottom:1px solid #f9f4f7;}
+.grade-tbl tbody td:first-child{text-align:left;font-weight:500;}
+.grade-tbl tbody tr:last-child td{border-bottom:none;}
+.grade-tbl tbody tr:nth-child(even) td{background:#fdf8fb;}
+.g-badge{display:inline-block;min-width:36px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:900;}
+.g-badge.a{background:#e8f5e9;color:#2e7d32;}
+.g-badge.b{background:#e3f2fd;color:#1565c0;}
+.g-badge.c{background:#fff3e0;color:#e65100;}
+.g-badge.d{background:#fce4ec;color:#880e4f;}
+.g-badge.e{background:#fafafa;color:#aaa;}
+.gp-val{font-weight:800;color:#c2185b;font-size:13px;}
+.p2-footer{margin-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#bbb;}
+.p2-footer strong{color:#888;}
+
+.error-wrap{max-width:500px;margin:100px auto;background:#fff;border-radius:16px;padding:40px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.error-wrap h2{color:#c2185b;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<div class="status-bar" id="status">Preparing…</div>
+<div class="toolbar">
+  <button class="btn btn-back" onclick="history.back()">← Back</button>
+  <button class="btn btn-dl" id="dl-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+</div>
+
+<div class="pages-wrapper" id="pages-wrapper" style="display:none;">
+
+  <!-- PAGE 1 -->
+  <div class="card-page" id="page1">
+    <div class="p1-left">
+      <div class="school-logo-ring"><span id="logo-initials">EK</span></div>
+      <div class="school-name-left" id="sn-left">EuroKids</div>
+      <div class="school-branch-left" id="sb-left">Mulayamnagar, Lucknow</div>
+      <div class="school-addr-left" id="sa-left"></div>
+      <div class="divider-left"></div>
+      <div class="sidebar-row"><div class="sidebar-label">Student Name</div><div class="sidebar-value" id="sd-name">–</div></div>
+      <div class="sidebar-row"><div class="sidebar-label">Father's Name</div><div class="sidebar-value" id="sd-father">–</div></div>
+      <div class="sidebar-row"><div class="sidebar-label">Class &amp; Section</div><div class="sidebar-value" id="sd-class">–</div></div>
+      <div class="sidebar-row"><div class="sidebar-label">Roll Number</div><div class="sidebar-value" id="sd-roll">–</div></div>
+      <div class="perf-ring-wrap">
+        <div class="perf-ring">
+          <svg width="116" height="116" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/>
+            <circle id="ring-circle" cx="50" cy="50" r="42" fill="none" stroke="url(#rg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9"/>
+            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f48fb1"/><stop offset="100%" stop-color="#e91e8c"/></linearGradient></defs>
+          </svg>
+          <div class="ring-text"><span class="ring-pct" id="ring-pct">0%</span><span class="ring-label">Score</span></div>
+        </div>
+        <div class="perf-meta">
+          <div class="pm-item"><span class="pm-val" id="pm-total">–</span><span class="pm-key">Total</span></div>
+          <div class="pm-item"><span class="pm-val" id="pm-gp">–</span><span class="pm-key">Avg GP</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accent-bar"></div>
+
+    <div class="p1-right">
+      <div class="right-header">
+        <div>
+          <div class="report-tag">Progress Report</div>
+          <div style="font-size:11px;color:#bbb;margin-top:5px;" id="session-tag"></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px;font-weight:700;color:#bbb;letter-spacing:1px;text-transform:uppercase;">Printed</div>
+          <div style="font-size:11px;font-weight:600;color:#555;" id="printed-on"></div>
+        </div>
+      </div>
+
+      <div class="s-head">Subject-wise Performance</div>
+      <table class="marks-table">
+        <thead><tr><th style="width:22px">#</th><th style="text-align:left">Subject</th><th style="width:36px">Full</th><th style="width:42px">Scored</th><th>Performance</th><th style="width:50px">Grade</th><th style="width:30px">GP</th></tr></thead>
+        <tbody id="marks-body"></tbody>
+      </table>
+
+      <div class="s-head" style="margin-top:8px;">Co-Scholastic Assessment</div>
+      <div class="cos-grid" id="cos-grid"></div>
+
+      <div class="remarks-block">
+        <div class="rem-icon">✍️</div>
+        <div><div class="rem-text" id="rem-text">–</div><div class="rem-author" id="rem-author">— Class Teacher</div></div>
+      </div>
+
+      <div class="sig-strip">
+        <div class="sig-item"><div class="sig-line"><span class="sig-script" id="sig-teacher">Teacher</span></div><div class="sig-label">Class Teacher</div></div>
+        <div class="sig-item"><div class="sig-line"></div><div class="sig-label">Parent / Guardian</div></div>
+        <div class="sig-item"><div class="sig-line"><span class="sig-script" id="sig-principal">Principal</span></div><div class="sig-label">Principal</div></div>
+      </div>
+
+      <div class="page-footer">
+        <strong id="footer-school">–</strong>
+        <span id="footer-date">–</span>
+        <span>Computer-generated — no manual signature required</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="card-page" id="page2">
+    <div class="p2-bg"></div>
+    <div class="p2-content">
+      <div class="p2-header">
+        <div class="p2-title"><span>Assessment &amp; Grading</span>Scale Reference</div>
+        <div class="p2-school-badge"><div class="bn" id="p2-school-name">School</div><div class="bs" id="p2-school-branch">Progress Report</div></div>
+      </div>
+      <div class="p2-tables">
+        <div class="grade-card">
+          <div class="grade-card-head formative"><div class="gh-icon">📋</div><div><div class="gh-title">Formative Assessment</div><div class="gh-sub">Internal / Continuous Evaluation</div></div></div>
+          <table class="grade-tbl">
+            <thead><tr><th>Marks (out of 5)</th><th>Grade</th><th>Marks (out of 20)</th></tr></thead>
+            <tbody>
+              <tr><td>4.5 – 5.0</td><td><span class="g-badge a">A1</span></td><td>18.5 – 20</td></tr>
+              <tr><td>4.0 – 4.5</td><td><span class="g-badge a">A2</span></td><td>16.5 – 18</td></tr>
+              <tr><td>3.5 – 4.0</td><td><span class="g-badge b">B1</span></td><td>14.5 – 16</td></tr>
+              <tr><td>3.0 – 3.5</td><td><span class="g-badge b">B2</span></td><td>12.5 – 14</td></tr>
+              <tr><td>2.5 – 3.0</td><td><span class="g-badge c">C1</span></td><td>10.5 – 12</td></tr>
+              <tr><td>2.0 – 2.5</td><td><span class="g-badge c">C2</span></td><td>8.5 – 10</td></tr>
+              <tr><td>1.5 – 2.0</td><td><span class="g-badge d">D</span></td><td>7 – 8</td></tr>
+              <tr><td>0 – 1.5</td><td><span class="g-badge e">E</span></td><td>&lt; 7</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grade-card">
+          <div class="grade-card-head summative"><div class="gh-icon">📝</div><div><div class="gh-title">Summative Assessment</div><div class="gh-sub">Term-end / Annual Examination</div></div></div>
+          <table class="grade-tbl">
+            <thead><tr><th>Percentage (%)</th><th>Grade</th><th>Grade Point</th></tr></thead>
+            <tbody>
+              <tr><td>91 – 100</td><td><span class="g-badge a">A1</span></td><td><span class="gp-val">10</span></td></tr>
+              <tr><td>81 – 90</td><td><span class="g-badge a">A2</span></td><td><span class="gp-val">9</span></td></tr>
+              <tr><td>71 – 80</td><td><span class="g-badge b">B1</span></td><td><span class="gp-val">8</span></td></tr>
+              <tr><td>61 – 70</td><td><span class="g-badge b">B2</span></td><td><span class="gp-val">7</span></td></tr>
+              <tr><td>51 – 60</td><td><span class="g-badge c">C1</span></td><td><span class="gp-val">6</span></td></tr>
+              <tr><td>41 – 50</td><td><span class="g-badge c">C2</span></td><td><span class="gp-val">5</span></td></tr>
+              <tr><td>35 – 40</td><td><span class="g-badge d">D</span></td><td><span class="gp-val">4</span></td></tr>
+              <tr><td>0 – 34</td><td><span class="g-badge e">E</span></td><td><span class="gp-val">3</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="p2-footer"><strong id="p2-footer-school">–</strong><span id="p2-date">–</span><span>This document is computer-generated and valid without physical signature.</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="error-wrap" id="error-wrap" style="display:none;">
+  <h2>No result data found</h2>
+  <p>Open the result in <strong>index.html</strong> and click Download PDF from there.</p>
+</div>
+
+<script>
+const KEY='selectedStudentResult';
+let DATA=null;
+
+function dateIN(){return new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'SC';}
+function gpClass(g){if(!g)return'gpe';const u=g.toUpperCase();if(u.startsWith('A'))return'gpa';if(u.startsWith('B'))return'gpb';if(u.startsWith('C'))return'gpc';if(u==='D')return'gpd';return'gpe';}
+
+function populate(data){
+  const sch=data.school||{}, stu=data.student||{}, subs=stu.subjects||[], cos=stu.coScholastic||{};
+  const sName=sch.name||'School', sBranch=sch.branch||'', sAddr=[sch.address,sch.contact].filter(Boolean).join(' · ');
+
+  document.getElementById('logo-initials').textContent=initials(sName);
+  document.getElementById('sn-left').textContent=sName;
+  document.getElementById('sb-left').textContent=sBranch;
+  document.getElementById('sa-left').textContent=sAddr;
+  document.getElementById('p2-school-name').textContent=sName;
+  document.getElementById('p2-school-branch').textContent=sBranch;
+  document.getElementById('footer-school').textContent=[sName,sBranch].filter(Boolean).join(' · ');
+  document.getElementById('p2-footer-school').textContent=[sName,sBranch].filter(Boolean).join(' · ');
+  document.getElementById('printed-on').textContent=dateIN();
+  document.getElementById('footer-date').textContent='Printed: '+dateIN();
+  document.getElementById('p2-date').textContent='Printed: '+dateIN();
+  if(sch.session)document.getElementById('session-tag').textContent='Academic Session: '+sch.session;
+
+  document.getElementById('sd-name').textContent=stu.name||'–';
+  document.getElementById('sd-father').textContent=stu.fatherName||'–';
+  document.getElementById('sd-class').textContent=stu.class?(stu.class+(stu.section?' — Sec. '+stu.section:'')):'–';
+  document.getElementById('sd-roll').textContent=stu.rollNo||'–';
+
+  const totalFull=subs.reduce((a,s)=>a+Number(s.fullMarks||0),0);
+  const totalObt=subs.reduce((a,s)=>a+Number(s.marksObtained||0),0);
+  const pct=totalFull?(totalObt/totalFull*100).toFixed(1):'0.0';
+  const avgGP=subs.length?(subs.reduce((a,s)=>a+Number(s.gradePoint||0),0)/subs.length).toFixed(1):'0.0';
+
+  document.getElementById('ring-pct').textContent=pct+'%';
+  document.getElementById('pm-total').textContent=totalObt+'/'+totalFull;
+  document.getElementById('pm-gp').textContent=avgGP;
+
+  const circ=2*Math.PI*42;
+  const circle=document.getElementById('ring-circle');
+  circle.style.strokeDasharray=circ;
+  circle.style.strokeDashoffset=circ-(parseFloat(pct)/100)*circ;
+
+  const tbody=document.getElementById('marks-body');
+  tbody.innerHTML='';
+  subs.forEach((sub,i)=>{
+    const p=sub.fullMarks?Math.round(Number(sub.marksObtained||0)/Number(sub.fullMarks)*100):0;
+    const gc=gpClass(sub.grade);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="color:#bbb">${i+1}</td><td>${sub.name||''}</td><td>${sub.fullMarks??''}</td><td style="font-weight:700;color:#1a1a2e">${sub.marksObtained??''}</td><td><div class="tbar"><div class="tbar-track"><div class="tbar-fill" style="width:${p}%"></div></div><div class="tbar-pct">${p}%</div></div></td><td><span class="grade-pill ${gc}">${sub.grade||''}</span></td><td style="font-weight:800;color:#c2185b">${sub.gradePoint??''}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const grid=document.getElementById('cos-grid');
+  grid.innerHTML='';
+  Object.entries(cos).forEach(([k,v])=>{
+    const d=document.createElement('div');d.className='cos-item';
+    d.innerHTML=`<div class="cos-key">${k}</div><div class="cos-val">${v}</div>`;
+    grid.appendChild(d);
+  });
+
+  document.getElementById('rem-text').textContent=stu.remarks||'–';
+  document.getElementById('rem-author').textContent=stu.teacherSignature?'— '+stu.teacherSignature+', Class Teacher':'— Class Teacher';
+  document.getElementById('sig-teacher').textContent=stu.teacherSignature||'Teacher';
+  document.getElementById('sig-principal').textContent=sch.principal||'Principal';
+}
+
+async function downloadPDF(){
+  const btn=document.getElementById('dl-btn');
+  btn.disabled=true;btn.textContent='Generating…';
+  document.getElementById('status').textContent='Rendering…';
+  const{jsPDF}=window.jspdf;
+  const pdf=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+  for(let i=0;i<2;i++){
+    const el=document.getElementById('page'+(i+1));
+    const canvas=await html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,width:1122,height:794});
+    const img=canvas.toDataURL('image/jpeg',0.97);
+    if(i>0)pdf.addPage('a4','landscape');
+    pdf.addImage(img,'JPEG',0,0,297,210);
+    document.getElementById('status').textContent=`Page ${i+1}/2 done…`;
+  }
+  const name=(DATA?.student?.name||'result').replace(/\s+/g,'_');
+  pdf.save(`${name}_Report_Card.pdf`);
+  document.getElementById('status').textContent='PDF saved ✓';
+  btn.disabled=false;btn.textContent='⬇ Download PDF';
+}
+
+function init(){
+  const raw=localStorage.getItem(KEY);
+  if(!raw){document.getElementById('error-wrap').style.display='block';document.getElementById('status').style.display='none';return;}
+  try{
+    DATA=JSON.parse(raw);populate(DATA);
+    document.getElementById('pages-wrapper').style.display='flex';
+    document.getElementById('status').textContent='Ready';
+    setTimeout(()=>downloadPDF().catch(()=>{}),800);
+  }catch(e){document.getElementById('error-wrap').style.display='block';document.getElementById('status').style.display='none';}
+}
+window.addEventListener('load',init);
+</script>
+</body>
+</html>

@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EuroKids – Student Result Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #6b21a8;
+    --primary-light: #a855f7;
+    --primary-dark: #4a0e7a;
+    --gold: #f59e0b;
+    --gold-light: #fde68a;
+    --success: #059669;
+    --danger: #dc2626;
+    --bg: #f5f0ff;
+    --card-bg: #ffffff;
+    --text: #1e1b2e;
+    --text-muted: #6b7280;
+    --border: #e9d5ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  /* ── FORM SCREEN ── */
+  .form-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e1b2e 0%, #4a0e7a 50%, #6b21a8 100%);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
+    top: -200px; right: -100px;
+    pointer-events: none;
+  }
+  .form-screen::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+    bottom: -150px; left: -100px;
+    pointer-events: none;
+  }
+
+  .form-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.6s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .form-logo .school-badge {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--gold), #d97706);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 32px rgba(245,158,11,0.4);
+  }
+  .form-logo h1 {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+  .form-logo h1 span { color: var(--gold); }
+  .form-logo p { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 0.25rem; }
+
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .field-group { margin-bottom: 1.25rem; }
+  .field-group label {
+    display: block;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .field-group select,
+  .field-group input {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    appearance: none;
+  }
+  .field-group select option { background: #2d1b4e; color: #fff; }
+  .field-group select:focus,
+  .field-group input:focus {
+    border-color: var(--primary-light);
+    background: rgba(168,85,247,0.12);
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.2);
+  }
+  .field-group input::placeholder { color: rgba(255,255,255,0.3); }
+
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--gold), #d97706);
+    border: none;
+    border-radius: 12px;
+    color: #1e1b2e;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    margin-top: 0.75rem;
+    box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.5); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .error-msg {
+    background: rgba(220,38,38,0.2);
+    border: 1px solid rgba(220,38,38,0.4);
+    color: #fca5a5;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    display: none;
+    text-align: center;
+  }
+
+  /* ── RESULT SCREEN ── */
+  .result-screen {
+    display: none;
+    min-height: 100vh;
+    background: var(--bg);
+    padding: 2rem 1rem;
+  }
+
+  .result-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.875rem;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .back-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1.4rem;
+    font-size: 0.875rem;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 15px rgba(107,33,168,0.35);
+  }
+  .download-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(107,33,168,0.45); }
+
+  /* ── THE REPORT CARD ── */
+  #report-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(107,33,168,0.15);
+    animation: fadeUp 0.5s ease;
+  }
+
+  /* Header */
+  .rc-header {
+    background: linear-gradient(135deg, #1e1b2e 0%, #4a0e7a 60%, #6b21a8 100%);
+    padding: 2.5rem 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .rc-header::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+    top: -100px; right: -50px;
+  }
+  .rc-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .school-logo-badge {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--gold), #d97706);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+  }
+  .school-info h1 {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 1.8rem;
+    letter-spacing: 0.5px;
+  }
+  .school-info h1 span { color: var(--gold); }
+  .school-info p { color: rgba(255,255,255,0.6); font-size: 0.82rem; margin-top: 0.3rem; }
+
+  .rc-header-right {
+    margin-left: auto;
+    text-align: right;
+    position: relative; z-index:1;
+  }
+  .session-badge {
+    background: rgba(245,158,11,0.2);
+    border: 1px solid rgba(245,158,11,0.4);
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    color: var(--gold-light);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+  .report-title-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .result-badge.pass {
+    background: rgba(5,150,105,0.2);
+    border: 1px solid rgba(5,150,105,0.5);
+    color: #6ee7b7;
+  }
+  .result-badge.fail {
+    background: rgba(220,38,38,0.2);
+    border: 1px solid rgba(220,38,38,0.5);
+    color: #fca5a5;
+  }
+
+  /* Student Info Strip */
+  .student-info-strip {
+    background: linear-gradient(90deg, #faf5ff, #fdf4ff);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+  }
+  .info-item label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .info-item span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  /* Body */
+  .rc-body { padding: 2rem 2.5rem; }
+
+  /* Performance Overview */
+  .perf-overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .perf-card {
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .perf-card.total-marks {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border: 1px solid #c4b5fd;
+  }
+  .perf-card.percentage {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #fbbf24;
+  }
+  .perf-card.grade-point {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 1px solid #6ee7b7;
+  }
+  .perf-card .perf-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+  }
+  .perf-card.total-marks .perf-value { color: var(--primary); }
+  .perf-card.percentage .perf-value { color: #92400e; }
+  .perf-card.grade-point .perf-value { color: #065f46; }
+  .perf-card .perf-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+    opacity: 0.6;
+  }
+
+  /* Section Heading */
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--primary-dark);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Marks Table */
+  .marks-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .marks-table thead tr {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+  }
+  .marks-table th {
+    padding: 0.85rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: left;
+  }
+  .marks-table th:last-child, .marks-table td:last-child { text-align: center; }
+  .marks-table th:nth-child(3), .marks-table td:nth-child(3) { text-align: center; }
+  .marks-table th:nth-child(4), .marks-table td:nth-child(4) { text-align: center; }
+  .marks-table tbody tr:nth-child(even) { background: #faf5ff; }
+  .marks-table tbody tr:hover { background: #f3e8ff; }
+  .marks-table td {
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .marks-table tbody tr:last-child td { border-bottom: none; }
+  .marks-table .subject-name { font-weight: 600; }
+
+  /* Progress Bar */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 7px;
+    background: #e9d5ff;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--primary-light), var(--primary));
+    transition: width 1s ease;
+  }
+  .progress-pct {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 35px;
+    text-align: right;
+  }
+
+  /* Grade Pill */
+  .grade-pill {
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .grade-A1 { background: #d1fae5; color: #065f46; }
+  .grade-A2 { background: #dbeafe; color: #1e3a8a; }
+  .grade-B1 { background: #ede9fe; color: #4c1d95; }
+  .grade-B2 { background: #fef3c7; color: #92400e; }
+  .grade-C1 { background: #ffedd5; color: #9a3412; }
+  .grade-C2 { background: #fee2e2; color: #991b1b; }
+  .grade-D  { background: #fce7f3; color: #831843; }
+  .grade-E  { background: #f3f4f6; color: #374151; }
+
+  /* Grade Point cell */
+  .gp-val { font-weight: 700; color: var(--primary); }
+
+  /* Co-Scholastic */
+  .coscholastic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .cos-item {
+    background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .cos-item .cos-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  .cos-item .cos-val {
+    font-size: 1.5rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  /* Remarks */
+  .remarks-box {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #fbbf24;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .remarks-box .remarks-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .remarks-box .remarks-text {
+    font-style: italic;
+    color: #78350f;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .remarks-box .remarks-author {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #92400e;
+    margin-top: 0.4rem;
+  }
+
+  /* Signatures */
+  .sig-row {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px dashed var(--border);
+    padding-top: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  .sig-item { text-align: center; }
+  .sig-item .sig-line {
+    width: 140px;
+    border-bottom: 1.5px solid var(--primary);
+    margin-bottom: 0.4rem;
+    height: 32px;
+  }
+  .sig-item .sig-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  /* Footer */
+  .rc-footer {
+    background: linear-gradient(90deg, #1e1b2e, #4a0e7a);
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .rc-footer p { color: rgba(255,255,255,0.5); font-size: 0.78rem; }
+  .rc-footer .footer-brand {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 0.9rem;
+  }
+  .rc-footer .footer-brand span { color: var(--gold); }
+
+  /* Print / Download Styles */
+  @media print {
+    body { background: white; }
+    .result-screen { padding: 0; background: white; }
+    .top-actions { display: none !important; }
+    .result-wrapper { max-width: 100%; }
+    #report-card { box-shadow: none; border-radius: 0; }
+    .progress-bar-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  @media (max-width: 600px) {
+    .rc-header-inner { flex-wrap: wrap; }
+    .rc-header-right { margin-left: 0; text-align: left; }
+    .student-info-strip { padding: 1.25rem 1.5rem; }
+    .rc-body { padding: 1.5rem 1.5rem; }
+    .perf-overview { grid-template-columns: repeat(3,1fr); gap: 0.6rem; }
+    .perf-card { padding: 1rem 0.5rem; }
+    .perf-card .perf-value { font-size: 1.4rem; }
+    .coscholastic-grid { grid-template-columns: repeat(2,1fr); }
+    .sig-row { flex-direction: column; align-items: center; gap: 1.5rem; }
+    .rc-footer { flex-direction: column; text-align: center; }
+    .form-card { padding: 2rem 1.5rem; }
+    .marks-table th, .marks-table td { padding: 0.65rem 0.7rem; font-size: 0.82rem; }
+  }
+
+
+
+
+
+
+  .signature-text {
+  font-family: 'Great Vibes', cursive;
+  font-size: 1.1rem;   /* smaller */
+  color: #2d1b4e;
+  display: block;
+  margin-top: -18px;
+}
+
+.principal-sign {
+  font-family: 'Great Vibes', cursive;
+  font-size: 1.1rem;
+  color: #2d1b4e;
+  display: block;
+  margin-top: -18px;
+}
+
+.sig-label {
+  margin-top: 6px;
+}
+
+
+.sig-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* KEY FIX */
+  border-top: 1px dashed var(--border);
+  padding-top: 2rem;
+  margin-top: 1rem;
+}
+
+.sig-item {
+  text-align: center;
+  width: 30%;
+}
+
+
+.sig-line {
+  width: 160px;
+  margin: 0 auto;
+  border-bottom: 1.5px solid #6b21a8;
+  height: 30px;
+}
+
+
+
+
+.sig-item {
+  text-align: center;
+  width: 30%;
+  position: relative;
+}
+
+.sig-line {
+  width: 160px;
+  margin: 0 auto;
+  border-bottom: 1.5px solid #6b21a8;
+  height: 20px;
+}
+
+.signature-text,
+.principal-sign {
+  font-family: 'Great Vibes', cursive;
+  font-size: 1.1rem;
+  color: #2d1b4e;
+
+  position: absolute;      /* KEY FIX */
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;               /* adjust this */
+  background: white;       /* hides line behind text */
+  padding: 0 6px;          /* spacing so line doesn't touch text */
+}
+</style>
+</head>
+<body>
+
+<!-- ─── FORM SCREEN ─── -->
+<div class="form-screen" id="form-screen">
+  <div class="form-card">
+    <div class="form-logo">
+      <!-- <div class="school-badge">🌟</div> -->
+      <h1>Euro<span>Kids</span></h1>
+      <p> 1A, Jyoti Vihar,Faizabad road, Mulayam Nagar, Lucknow</p>
+    </div>
+    <div class="form-title">View Your Result</div>
+
+    <div class="field-group">
+      <label>Academic Year</label>
+      <select id="f-year">
+        <option value="2026">Select Year</option>
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>    
+         <option value="2024">2024</option>
+              <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Class</label>
+      <select id="f-class">
+        <option value="EuroSenior">Select Class</option>
+        <option value="Toddler">Toddler</option>
+        <option value="Playgroup">Playgroup</option>
+        <option value="Nursery">Nursery</option>
+        <option value="Eurojunior">Euro Junior</option>
+        <option value="EuroSenior">Euro Senior</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Roll Number</label>
+      <input type="text" id="f-roll" placeholder="e.g. 101" value="101"/>
+    </div>
+
+    <button class="submit-btn" onclick="lookupResult()">View Result Card →</button>
+    <div class="error-msg" id="error-msg">⚠️ No record found. Please check your details and try again.</div>
+  </div>
+</div>
+
+<!-- ─── RESULT SCREEN ─── -->
+<div class="result-screen" id="result-screen">
+  <div class="result-wrapper">
+    <div class="top-actions">
+      <button class="back-btn" onclick="goBack()">← Back</button>
+      <button class="download-btn" onclick="downloadCard()">⬇ Download PDF</button>
+    </div>
+
+    <div id="report-card">
+      <!-- Header -->
+      <div class="rc-header">
+        <div class="rc-header-inner">
+          <!-- <div class="school-logo-badge">🌟</div> -->
+          <div class="school-info">
+            <h1>Euro<span>Kids</span></h1>
+            <p>Mulayamnagar, Lucknow · Recognised by Govt. of U.P.</p>
+            <p>1A Jyoti Vihar, Faizabad Road · +91 9838903242</p>
+          </div>
+          <div class="rc-header-right">
+            <div class="session-badge" id="rc-session">SESSION 2025–26</div>
+            <div class="report-title-label">Progress Report Card</div>
+            <div class="result-badge pass" id="rc-result-badge">✔ PASS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Info -->
+      <div class="student-info-strip">
+        <div class="info-item"><label>Student Name</label><span id="rc-name">–</span></div>
+        <div class="info-item"><label>Father's Name</label><span id="rc-father">–</span></div>
+        <div class="info-item"><label>Class & Section</label><span id="rc-class">–</span></div>
+        <div class="info-item"><label>Roll No.</label><span id="rc-roll">–</span></div>
+      </div>
+
+      <div class="rc-body">
+        <!-- Performance Cards -->
+        <div class="perf-overview">
+          <div class="perf-card total-marks">
+            <span class="perf-value" id="rc-total">–</span>
+            <div class="perf-label">Total Marks</div>
+          </div>
+          <div class="perf-card percentage">
+            <span class="perf-value" id="rc-pct">–</span>
+            <div class="perf-label">Percentage</div>
+          </div>
+          <div class="perf-card grade-point">
+            <span class="perf-value" id="rc-cgpa">–</span>
+            <div class="perf-label">Avg GPA</div>
+          </div>
+        </div>
+
+        <!-- Marks Table -->
+        <div class="section-heading">📚 Subject-wise Performance</div>
+        <table class="marks-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Subject</th>
+              <th>Full Marks</th>
+              <th>Obtained</th>
+              <th style="min-width:160px">Performance</th>
+              <th>Grade</th>
+              <th>GP</th>
+            </tr>
+          </thead>
+          <tbody id="rc-subjects"></tbody>
+        </table>
+
+        <!-- Co-Scholastic -->
+        <div class="section-heading">🌱 Co-Scholastic Assessment</div>
+        <div class="coscholastic-grid" id="rc-coscholastic"></div>
+
+        <!-- Remarks -->
+        <div class="section-heading">💬 Teacher's Remarks</div>
+        <div class="remarks-box">
+          <div class="remarks-icon">✍️</div>
+          <div>
+            <div class="remarks-text" id="rc-remarks">–</div>
+            <div class="remarks-author" id="rc-teacher">– Class Teacher</div>
+          </div>
+        </div>
+
+
+        <div class="sig-row">
+  <div class="sig-item">
+    <div class="sig-line"></div>
+    <span class="signature-text" id="teacher-sign"></span>
+    <div class="sig-label">Class Teacher</div>
+  </div>
+
+  <div class="sig-item">
+    <div class="sig-line"></div>
+    <div class="sig-label">Parent / Guardian</div>
+  </div>
+
+  <div class="sig-item">
+    <div class="sig-line"></div>
+    <span class="principal-sign">Neha Dwivedi</span>
+    <div class="sig-label">Principal</div>
+  </div>
+</div>
+
+      <!-- Footer -->
+      <div class="rc-footer">
+        <div class="footer-brand">Euro<span>Kids</span> · Mulayamnagar</div>
+        <p>This is a computer-generated report card.</p>
+        <p id="rc-printed-on">–</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Embedded data (mirrors results.json) ──
+const resultsData = {
+  school: {
+    name: "EuroKids",
+    branch: "Mulayamnagar, Lucknow",
+    session: "2025-26",
+    principal: "Neha Dwivedi",
+    contact: "+91 9838903242",
+    address: "1A, Jyoti Vihar, Faizabad Road, Mulayam Nagar, Lucknow"
+  },
+  students: [
+    {
+      rollNo: "101",
+      name: "Aarav Sharma",
+      fatherName: "Rajesh Sharma",
+      class: "EuroSenior",
+      section: "A",
+      year: "2026",
+      subjects: [
+        { name: "English", fullMarks: 100, marksObtained: 92, grade: "A1", gradePoint: 10 },
+        { name: "Hindi", fullMarks: 100, marksObtained: 88, grade: "A2", gradePoint: 9 },
+        { name: "Mathematics", fullMarks: 100, marksObtained: 95, grade: "A1", gradePoint: 10 },
+        { name: "Environmental Science", fullMarks: 100, marksObtained: 85, grade: "A2", gradePoint: 9 },
+        { name: "General Knowledge", fullMarks: 50, marksObtained: 46, grade: "A1", gradePoint: 10 },
+        { name: "Drawing & Art", fullMarks: 50, marksObtained: 44, grade: "A1", gradePoint: 10 }
+      ],
+      coScholastic: { Discipline: "A", Attendance: "95%", Homework: "A", Handwriting: "B", Cleanliness: "A", Punctuality: "A" },
+      remarks: "Excellent performance! Aarav has shown outstanding dedication and enthusiasm throughout the session.",
+      teacherSignature: "Sujeet Dwivedi",
+      result: "PASS"
+    },
+    {
+      rollNo: "102",
+      name: "Zara Khan",
+      fatherName: "Mohammed Arif Khan",
+      class: "Nursery",
+      section: "B",
+      year: "2026",
+      subjects: [
+        { name: "English", fullMarks: 100, marksObtained: 78, grade: "B1", gradePoint: 8 },
+        { name: "Hindi", fullMarks: 100, marksObtained: 82, grade: "A2", gradePoint: 9 },
+        { name: "Mathematics", fullMarks: 100, marksObtained: 74, grade: "B1", gradePoint: 8 },
+        { name: "Environmental Science", fullMarks: 100, marksObtained: 80, grade: "A2", gradePoint: 9 },
+        { name: "General Knowledge", fullMarks: 50, marksObtained: 38, grade: "B1", gradePoint: 8 },
+        { name: "Drawing & Art", fullMarks: 50, marksObtained: 45, grade: "A1", gradePoint: 10 }
+      ],
+      coScholastic: { Discipline: "A", Attendance: "89%", Homework: "B", Handwriting: "A", Cleanliness: "A", Punctuality: "B" },
+      remarks: "Good effort! Zara is creative and hardworking. Keep up the wonderful spirit!",
+      teacherSignature: "Ms. Sunita Verma",
+      result: "PASS"
+    },
+    {
+      rollNo: "103",
+      name: "Ishaan Patel",
+      fatherName: "Vikram Patel",
+      class: "Playgroup",
+      section: "A",
+      year: "2026",
+      subjects: [
+        { name: "English", fullMarks: 100, marksObtained: 65, grade: "C1", gradePoint: 6 },
+        { name: "Hindi", fullMarks: 100, marksObtained: 70, grade: "B2", gradePoint: 7 },
+        { name: "Mathematics", fullMarks: 100, marksObtained: 72, grade: "B1", gradePoint: 8 },
+        { name: "Environmental Science", fullMarks: 100, marksObtained: 68, grade: "B2", gradePoint: 7 },
+        { name: "General Knowledge", fullMarks: 50, marksObtained: 30, grade: "B2", gradePoint: 7 },
+        { name: "Drawing & Art", fullMarks: 50, marksObtained: 42, grade: "A1", gradePoint: 10 }
+      ],
+      coScholastic: { Discipline: "B", Attendance: "82%", Homework: "C", Handwriting: "B", Cleanliness: "B", Punctuality: "B" },
+      remarks: "Ishaan is progressing well. With more focus on studies, he can achieve great results next term.",
+      teacherSignature: "Ms. Anjali Singh",
+      result: "PASS"
+    }
+  ]
+};
+
+function lookupResult() {
+  const year  = document.getElementById('f-year').value.trim();
+  const cls   = document.getElementById('f-class').value.trim();
+  const roll  = document.getElementById('f-roll').value.trim();
+  const errEl = document.getElementById('error-msg');
+
+  if (!year || !cls || !roll) {
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ Please fill in all fields.';
+    return;
+  }
+
+  const student = resultsData.students.find(
+    s => s.rollNo === roll && s.class === cls && s.year === year
+  );
+
+  if (!student) {
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ No record found. Please check your details and try again.';
+    return;
+  }
+
+  errEl.style.display = 'none';
+  populateCard(student);
+  document.getElementById('form-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+  window.scrollTo(0, 0);
+}
+let currentStudent = null;
+
+function populateCard(s) {
+
+
+      currentStudent = s;
+
+  localStorage.setItem(
+    'selectedStudentResult',
+    JSON.stringify({
+      school: resultsData.school,
+      student: s
+    })
+  );
+    
+document.getElementById('teacher-sign').textContent = s.teacherSignature;
+  document.getElementById('rc-name').textContent    = s.name;
+  document.getElementById('rc-father').textContent  = s.fatherName;
+  document.getElementById('rc-class').textContent   = `${s.class} – Sec. ${s.section}`;
+  document.getElementById('rc-roll').textContent    = s.rollNo;
+  document.getElementById('rc-session').textContent = `SESSION ${resultsData.school.session.replace('-','–')}`;
+  document.getElementById('rc-printed-on').textContent = `Printed: ${new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'})}`;
+
+  // Result badge
+  const badge = document.getElementById('rc-result-badge');
+  if (s.result === 'PASS') {
+    badge.className = 'result-badge pass';
+    badge.textContent = '✔ PASS';
+  } else {
+    badge.className = 'result-badge fail';
+    badge.textContent = '✘ FAIL';
+  }
+
+  // Totals
+  const totalFull     = s.subjects.reduce((a,sub) => a + sub.fullMarks, 0);
+  const totalObtained = s.subjects.reduce((a,sub) => a + sub.marksObtained, 0);
+  const pct           = ((totalObtained / totalFull) * 100).toFixed(1);
+  const avgGP         = (s.subjects.reduce((a,sub) => a + sub.gradePoint, 0) / s.subjects.length).toFixed(1);
+
+  document.getElementById('rc-total').textContent = `${totalObtained}/${totalFull}`;
+  document.getElementById('rc-pct').textContent   = `${pct}%`;
+  document.getElementById('rc-cgpa').textContent  = avgGP;
+
+  // Subjects
+  const tbody = document.getElementById('rc-subjects');
+  tbody.innerHTML = '';
+  s.subjects.forEach((sub, i) => {
+    const pctSub = Math.round((sub.marksObtained / sub.fullMarks) * 100);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);font-size:0.8rem">${i+1}</td>
+      <td class="subject-name">${sub.name}</td>
+      <td style="text-align:center;color:var(--text-muted)">${sub.fullMarks}</td>
+      <td style="text-align:center;font-weight:700;color:var(--primary-dark)">${sub.marksObtained}</td>
+      <td>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:0%" data-w="${pctSub}%"></div>
+          </div>
+          <span class="progress-pct">${pctSub}%</span>
+        </div>
+      </td>
+      <td style="text-align:center"><span class="grade-pill grade-${sub.grade}">${sub.grade}</span></td>
+      <td style="text-align:center" class="gp-val">${sub.gradePoint}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  // Animate bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.progress-bar-fill').forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  }, 100);
+
+  // Co-Scholastic
+  const cosGrid = document.getElementById('rc-coscholastic');
+  cosGrid.innerHTML = '';
+  Object.entries(s.coScholastic).forEach(([key, val]) => {
+    const div = document.createElement('div');
+    div.className = 'cos-item';
+    div.innerHTML = `<div class="cos-label">${key}</div><div class="cos-val">${val}</div>`;
+    cosGrid.appendChild(div);
+  });
+
+  // Remarks
+  document.getElementById('rc-remarks').textContent  = s.remarks;
+  document.getElementById('rc-teacher').textContent  = `— ${s.teacherSignature}, Class Teacher`;
+}
+
+function goBack() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('form-screen').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+function downloadCard() {
+  if (!currentStudent) {
+    alert('Please open a result first.');
+    return;
+  }
+
+  window.open('download.html', '_blank');
+}
+</script>
+
+
+</body>
+</html>
